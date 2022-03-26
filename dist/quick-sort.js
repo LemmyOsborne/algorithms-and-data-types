@@ -3,9 +3,12 @@ const quickSort = (arr) => {
     const len = arr.length;
     if (len < 2)
         return arr;
-    let pivot = arr[0];
+    let rand = Math.floor(1 + Math.random() * (len - 1));
+    let pivot = arr[rand];
     const left = [];
     const right = [];
+    arr.splice(arr.indexOf(pivot), 1);
+    arr = [pivot].concat(arr);
     for (let i = 1; i < len; i++) {
         if (pivot > arr[i]) {
             left.push(arr[i]);
