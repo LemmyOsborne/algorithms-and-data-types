@@ -21,6 +21,47 @@ export class Graph {
       this.vertices[vertex2].push(vertex1);
     }
   }
+
+  // depth-first search
+  dfs(startVertex: string, callback: (vertex: string) => void) {
+    let list = this.vertices; // adjacency list
+    let stack = [startVertex]; // stack of vertices for enumeration
+    let visited = { [startVertex]: 1 }; // visited vertices
+
+    function handleVertex(vertex: string) {
+      // call callback for visited vertex
+      callback(vertex);
+
+      // obtaining adjancency list
+      let reversedNeighboursList = [...list[vertex]].reverse();
+
+      reversedNeighboursList.forEach((neighbour) => {
+        if (!visited[neighbour]) {
+          // marking vertex as visited
+          visited[neighbour] = 1;
+          // adding to stack
+          stack.push(neighbour);
+        }
+      });
+    }
+
+    // enumerating vertices from stack, while it's not empty
+    while (stack.length) {
+      let activeVertex = stack.pop();
+      if (activeVertex) handleVertex(activeVertex);
+    }
+
+    // checking if there isolated vertices
+    stack = Object.keys(this.vertices);
+
+    while (stack.length) {
+      let activeVertex = stack.pop();
+      if (activeVertex && !visited[activeVertex]) {
+        visited[activeVertex] = 1;
+        handleVertex(activeVertex);
+      }
+    }
+  }
 }
 export const graph = new Graph();
 
@@ -39,3 +80,5 @@ graph.addEdge("C", "D");
 graph.addEdge("C", "E");
 graph.addEdge("A", "F");
 graph.addEdge("F", "G");
+
+graph.dfs("A", (v) => console.log(v));
