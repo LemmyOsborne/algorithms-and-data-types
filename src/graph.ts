@@ -90,6 +90,7 @@ export class Graph {
       if (activeVertex) handleVertex(activeVertex);
     }
 
+    // checking if there isolated vertices
     queue = Object.keys(this.vertices);
 
     // repeating cycle for not visited vertices
@@ -101,9 +102,66 @@ export class Graph {
       }
     }
   }
+
+  // shortest way algorithm
+  findShortestWay(startVertex: string, finishVertex: string) {
+    let list = this.vertices;
+    let queue = [startVertex];
+    let visited = { [startVertex]: 1 };
+    function bfs2(startVertex: string) {
+      // shortest distance from starting vertex
+      let distance = { [startVertex]: 0 };
+      // previous vertex in graph
+      let previous = { [startVertex]: "" };
+
+      function handleVertex(vertex: string) {
+        let neighbourList = list[vertex];
+
+        neighbourList.forEach((neighbour) => {
+          if (!visited[neighbour]) {
+            visited[neighbour] = 1;
+            queue.push(neighbour);
+            // saving previous vertex
+            previous[neighbour] = vertex;
+            // saving distance
+            distance[neighbour] = distance[vertex] + 1;
+          }
+        });
+      }
+
+      // enumerating vertices from queue, while it's not empty
+      while (queue.length) {
+        let activeVertex = queue.shift();
+        if (activeVertex) handleVertex(activeVertex);
+      }
+
+      return { distance, previous };
+    }
+
+    let result = bfs2(startVertex);
+
+    if (!(finishVertex in result.previous)) {
+      console.error(
+        `Way from ${startVertex} to ${finishVertex} does not exist`
+      );
+    }
+
+    let path = [];
+
+    let currentVertex = finishVertex;
+
+    while (currentVertex !== startVertex) {
+      path.unshift(currentVertex);
+      currentVertex = result.previous[currentVertex];
+    }
+
+    path.unshift(startVertex);
+
+    return path;
+  }
 }
 
-export const graph = new Graph();
+const graph = new Graph();
 
 graph.addVertex("A");
 graph.addVertex("B");
@@ -121,6 +179,31 @@ graph.addEdge("C", "E");
 graph.addEdge("A", "F");
 graph.addEdge("F", "G");
 
+console.log("depth-first search");
 graph.dfs("A", (v) => console.log(v));
 console.log("-----------");
+console.log("bradth-first search");
 graph.bfs("A", (v) => console.log(v));
+
+let graph2 = new Graph();
+graph2.addVertex("A");
+graph2.addVertex("B");
+graph2.addVertex("C");
+graph2.addVertex("D");
+graph2.addVertex("E");
+graph2.addVertex("F");
+graph2.addVertex("G");
+graph2.addVertex("H");
+
+graph2.addEdge("A", "B");
+graph2.addEdge("B", "F");
+graph2.addEdge("F", "G");
+graph2.addEdge("A", "C");
+graph2.addEdge("C", "D");
+graph2.addEdge("D", "F");
+graph2.addEdge("C", "E");
+graph2.addEdge("E", "F");
+
+console.log("shortest way search");
+console.log(graph2.findShortestWay("A", "G"));
+console.log(graph2.findShortestWay("A", "Z"));
