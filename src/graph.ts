@@ -62,7 +62,47 @@ export class Graph {
       }
     }
   }
+
+  // breadth-first search
+  bfs(startVertex: string, callback: (vertex: string) => void) {
+    let list = this.vertices; // adjancency list
+    let queue = [startVertex]; // queue of vertices for enumerating
+    let visited = { [startVertex]: 1 }; // visited vertices
+
+    function handleVertex(vertex: string) {
+      // calling callback for visited vertex
+      callback(vertex);
+
+      // obtaining adjencency list
+      let neighbourList = list[vertex];
+
+      neighbourList.forEach((neighbour) => {
+        if (!visited[neighbour]) {
+          visited[neighbour] = 1;
+          queue.push(neighbour);
+        }
+      });
+    }
+
+    // enumerating vertices from queue, while it's not empty
+    while (queue.length) {
+      let activeVertex = queue.shift();
+      if (activeVertex) handleVertex(activeVertex);
+    }
+
+    queue = Object.keys(this.vertices);
+
+    // repeating cycle for not visited vertices
+    while (queue.length) {
+      let activeVertex = queue.shift();
+      if (activeVertex && !visited[activeVertex]) {
+        visited[activeVertex] = 1;
+        handleVertex(activeVertex);
+      }
+    }
+  }
 }
+
 export const graph = new Graph();
 
 graph.addVertex("A");
@@ -82,3 +122,5 @@ graph.addEdge("A", "F");
 graph.addEdge("F", "G");
 
 graph.dfs("A", (v) => console.log(v));
+console.log("-----------");
+graph.bfs("A", (v) => console.log(v));
